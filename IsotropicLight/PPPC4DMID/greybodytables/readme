@@ -1,0 +1,13 @@
+n=0 from BlackHawk
+
+For scalars, fermions, gauge bosons and n=0 gravitons:
+
+1) The first column is omega*r_h, and the second column is sigma/(pi*r_h^2)
+
+2) The table can be extrapolated with a constant value corresponding to the last number in the second column
+
+For n>0 gravitons:
+
+1) The first column is omega*r_h, and the second column is sum_l N_l |A_l|^2 / (omega*r_h)^(n+2) (note that there is an additional n^2 factor in the figure in the draft)
+
+2) The table can be extrapolated with a constant value corresponding to the last number in the second column
