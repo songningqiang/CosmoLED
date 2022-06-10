@@ -1852,192 +1852,39 @@ def galacticIntensity(Es, fdm0, M, Ned, Mstar, rhoEarth_eV, rNFW_eV, rEarth_eV, 
     ngam = fdm0/M * injSpec * Dmin #eV^2
     return ngam / (4*pi) / hbar**3 / c**2 * mpercm**2 / GeVpereV
 
-def lifetime(Mbh, Ned):
-    Nz = 5000
-    #zmin = 1e-2
-    #zmax = 1100 #decoupling
-
-    #zs = np.logspace(np.log10(zmax), np.log10(zmin), Nz) #redshifts
-    #ts = tofz(zs) #time in seconds
-    ts = np.logspace(6,18,10000)
-    Ms = calcMoft(ts, Mbh, Ned, 10e12, odeMethod = 'BDF') #Black hole masses in eV
-    plt.loglog(ts, Ms/eVperg)
-    #print(Ms[-1])
-    return ts[Ms > 0][-1]
-
 def main():
-#    Ned = 0
-#    M_g = 1.2e17
-
-#    #M_g = 47639.3801040134
-#    #M_g = 3e5
-#    M = M_g*eVperg
-
-#    Mstar = 10e12
-#    
-#    compton = "Ignore"
-#    maxf = maxfdm(M, Ned, Mstar, includeICSSpec = False, includeGalactic =True, includePositronSpec=True, useAjello=True, comptonTreatment = compton)
-#    Nz = 5000
-#    zmin = 1e-2
-#    zmax = 1100 #decoupling
-
-#    print('fdm = %.2e'%maxf)
-#    
-#    zs = np.logspace(np.log10(zmax), np.log10(zmin), Nz) #redshifts
-#    ts = tofz(zs) #time in seconds
-#    
-#    Ms = calcMoft(ts, M, Ned, Mstar, odeMethod = 'BDF') #Black hole masses in eV
-#    print('Mfin %.2e'%(Ms[-1]/eVperg))
-#    
-#    Es = np.logspace(2,10,10000)
-#    Is = extraGalacticIntensity(maxf, zs, Ms, Es, Ned, Mstar, M, comptonTreatment = compton, includeICS=False, includePositron=True)
-#    rhoEarth_eV = rhoEarth_GeVcm3 / GeVpereV * (hbar*c/mpercm)**3 #eV^4
-#    rNFW_eV = rNFW / kpcPerMpc / eVMpc #eV
-#    rEarth_eV = rEarth / kpcPerMpc / eVMpc #eV
-#    
-#    galI = galacticIntensity(Es, maxf*Ms[-1]/M, Ms[-1], Ned, Mstar, rhoEarth_eV,rNFW_eV,rEarth_eV, gNFW, includePositron = True)
-#    plt.loglog(Es,galI,'r',label='Gal')#,linewidth=1)
-#    plt.loglog(Es,Is,'g',label='EBL')#,linewidth=1)
-#    Is += galI
-#    np.savetxt('N %d M %.1e g spectrum.txt'%(Ned,M_g),np.array([Es, Is]).T) 
-#    plt.loglog(Es,Is,'k',label='Theory')#,linewidth=1)
-##    #maxf=1
-##    print('%e'%maxf)
-
-##    egretData = np.loadtxt('GammaData/EGRET-2004.csv',delimiter=',',skiprows=1)
-
-##    #EmidEgret = egretData[:,0]
-##    EwidthEgret = (egretData[:,4]-egretData[:,3])
-##    EmidEgret = (egretData[:,4]+egretData[:,3])/2
-##    IEgret = egretData[:,1] #* EwidthEgret
-##    dIEgret = egretData[:,2]#* EwidthEgret
-
-##    chandraData = np.loadtxt('GammaData/Chandra_XMM-2004.csv',delimiter=',',skiprows=1)
-
-##    #EmidChandra = chandraData[:,0]
-##    EwidthChandra = (chandraData[:,4]-chandraData[:,3])
-##    EmidChandra = (chandraData[:,4]+chandraData[:,3])/2
-##    IChandra = chandraData[:,1] #* EwidthChandra
-##    dIChandra = chandraData[:,2]#* EwidthChandra
-
-##    swiftData = np.loadtxt('GammaData/SWIFT_BAT-2008.csv',delimiter=',',skiprows=1)
-
-##    #EmidSwift = swiftData[:,0]
-##    EwidthSwift = (swiftData[:,4]-swiftData[:,3])
-##    EmidSwift = (swiftData[:,4]+swiftData[:,3])/2
-##    ISwift = swiftData[:,1] #* EwidthSwift
-##    dISwift = swiftData[:,2]#* EwidthSwift
-
-##    nagoyaData = np.loadtxt('GammaData/Nagoya-1975.csv',delimiter=',',skiprows=1)
-
-##    #EmidNagoya = nagoyaData[:,0]
-##    EwidthNagoya = (nagoyaData[:,4]-nagoyaData[:,3])
-##    EmidNagoya = (nagoyaData[:,4]+nagoyaData[:,3])/2
-##    INagoya = nagoyaData[:,1] #* EwidthNagoya
-##    dINagoya = nagoyaData[:,2]#* EwidthNagoya
-
-##    comptelData = np.loadtxt('GammaData/COMPTEL-2000.csv',delimiter=',',skiprows=1)
-
-##    #EmidComptel = comptelData[:,0]
-##    EwidthComptel = (comptelData[:,4]-comptelData[:,3])
-##    EmidComptel = (comptelData[:,4]+comptelData[:,3])/2
-##    IComptel = comptelData[:,1] #*EwidthComptel
-##    dIComptel = comptelData[:,2]#*EwidthComptel
-
-##    fermiData = np.genfromtxt('GammaData/FERMI_LAT-2015.txt',skip_header=61,skip_footer=52)
-
-##    EmidFermiA = (fermiData[:,2] + fermiData[:,1])/2
-##    EwidthFermiA = (fermiData[:,2] - fermiData[:,1])
-##    IFermiA = fermiData[:,3]/EwidthFermiA
-##    dIFermiA = np.array([np.sqrt(fermiData[:,4]**2 + fermiData[:,6]**2), np.sqrt(fermiData[:,5]**2 + fermiData[:,7]**2)])/EwidthFermiA 
-
-##    plt.errorbar(1e6*EmidChandra, 1e3*IChandra, 1e3*dIChandra, 1e6*EwidthChandra/2, fmt='none')
-##    plt.errorbar(1e6*EmidSwift, 1e3*ISwift, 1e3*dISwift, 1e6*EwidthSwift/2, fmt='none')
-##    plt.errorbar(1e6*EmidNagoya, 1e3*INagoya, 1e3*dINagoya, 1e6*EwidthNagoya/2, fmt='none')
-##    plt.errorbar(1e6*EmidComptel, 1e3*IComptel, 1e3*dIComptel,1e6* EwidthComptel/2, fmt='none')
-##    plt.errorbar(1e6*EmidEgret, 1e3*IEgret, 1e3*dIEgret, 1e6*EwidthEgret/2, fmt='none')
-##    plt.errorbar(1e6*EmidFermiA, 1e3*IFermiA, 1e3*dIFermiA, 1e6*EwidthFermiA/2, fmt='none')#, capsize=2,linewidth=1)
-
-#    constraints = maxIntensity(sigmaBound = 0, plot=True)
-#    #fluxErrors = (maxIntensity(sigmaBound = 1)-constraints)[:,1]
-#    
-#   # binWidth = constraints[:,3] - constraints[:,2]
-#    #plt.errorbar(constraints[:,0], constraints[:,1], fluxErrors, binWidth/2, fmt='none')
-
-##    plt.yscale('log')
-##    plt.xscale('log')
-#    plt.yscale('linear')
-#    plt.xscale('linear')
-#    #plt.tight_layout()
-#    #plt.xlim([4e5, 7e5])
-#    #plt.ylim([1e1,1e4])
-#    #plt.ylim([np.min(constraints[:,1])/10, np.max(constraints[:,1])*10])
-#    #plt.ylim([np.min(1e3*IFermiA)/10, np.max(galI)*10])
-#    #plt.legend(['Chandra', 'Swift', 'Nagoya', 'COMPTEL', 'EGRET', 'FERMI-LAT'])
-#    plt.ylabel('Flux (photon/cm$^2$/s/sr/eV)',fontsize=16)
-#    plt.xlabel('Energy (eV)',fontsize=16)
-#    #plt.legend(ncol=2,fontsize=11)
-#    #plt.ylim([1e0,1e2])
-#    plt.ylim([0,40])
-#    plt.xlim([5e5,6e5])
-#    #plt.title('$N_{ED}=5$, $M=10^{16}$g, $M_*=10$TeV',fontsize=14)
-#    #plt.title('N = %d M = %.1e g'%(Ned,M_g))
-#    #plt.savefig('N5 M1e16g spectrum.pdf')
-#    plt.show()
-#    
-#    exit()
-
-    Mstar = 10e12
+    Mstar = 10e12 #Scale of quantum gravity in eV
     Mstar_GeV = 10e3
 
-#    NmED = 1 #Number of masses when using extra dimensinos 
-    #NmED = 60
-    NmED = 5
-#    NmED = 27
     usePositrons = True #whether this scan should include the effect of positronium
     useICS = False #whether this scan should include the effect of ICS
     useGalaxy = True #whether this scan should use contribution of MW Halo
     useAjello = True #whether this scan should use Marco Ajello's Data
 
-    comptonMethod = 'Ignore'
+    comptonMethod = 'FullWhenEvaporated'
 
-    #Neds = [2, 3, 4, 5, 6]
-    #logMmins = [4, 7, 9, 10, 12]
-    #logMmaxs = [12, 16, 18, 18, 18]
-    Neds = [0]
-    logMmins = [17]
-    logMmaxs = [np.log10(1.8e17)]
-#    Neds = [4, 5, 6]
-#    logMmins = [9, 10, 12]
-#    logMmaxs = [18, 17, 17]
-
-    #Neds = [2]
-    #logMmins = [5]
-    #logMmaxs = [5]
+    Neds = [2, 3, 4, 5, 6] #Numbers of extra dimensions
+    logMmins = [4, 7, 9, 10, 12] #log10 of the smallest BH mass for each Ned in grams
+    logMmaxs = [12, 16, 18, 18, 18] #log10 of the largest BH mass for each Ned in grams
+    Nm = 60 #Number of black hole masses used
+    
     for i, Ned in enumerate(Neds):
-        Nm = NmED
         print('%d extra dimensions'%Ned)
         Mgs = np.logspace(logMmins[i], logMmaxs[i], Nm) #masses in grams
 
         initfdms = np.zeros(Nm)
-        bps = np.zeros(Nm)
         rhoDM = Omdm * rhoc0_gcm3 *(hbar*c/mpercm)**3 * eVperg
         for i, M_g in enumerate(Mgs):
-            #print(M_g)
             M = M_g * eVperg
             initfdms[i] = maxfdm(M, Ned, Mstar, includeICSSpec = useICS, includeGalactic =useGalaxy, includePositronSpec=usePositrons, useAjello=useAjello, comptonTreatment = comptonMethod)
 
             print("M = %e g   Max fdm_i = %g"%(M_g, initfdms[i]))
 
-#        plt.legend(['$M = %.3e$'%m for m in Mgs])
-#        plt.xlim([100,1100])
-#        plt.show()
-
         fileName = '%d Ned Constraint'%Ned
         if useAjello:
             fileName += ' AjelloData'
         else:
-            fileName += ' AviData'
+            fileName += ' OtherData'
         if useICS:
             fileName += ' with ICS'
         else:
@@ -2054,66 +1901,8 @@ def main():
         fileName += comptonMethod
         fileName += '.csv'
         np.savetxt(fileName,np.array([Mgs,initfdms]).T,delimiter=',')
-#        plt.loglog(Mgs,initfdms,'.')
-#        plt.show()
     
-#    plt.xlabel('$M_{PBH}$ (g)')
-    #plt.ylabel('$f_{dm,i}$')
-    #plt.legend(['$N_{ED} = %d$'%n for n in Neds])
-    #plt.xlim([1e4,1e18])
-    #plt.ylim([1e-10,1e-0])
-    #plt.xlim([9e13,5e14])
-    #plt.ylim([2e-5,9e-4])
-    #plt.ylim([1e-28,1e-12])
-    #plt.xlim([1e9,5e18])
-    #plt.ylim([1e-10, 1e-0])
-    #plt.savefig("constraints.png") 
-#    plt.show()
 
-#Ned = 0
-##Mis = np.logspace(np.log10(4.95e10), 17.5, 250)
-#Mis = 4.7999225960e+14 + np.logspace(5,18,150)
-#Mfs = np.zeros_like(Mis)
-#t0 = 4.354e17
-#for i, Mi in enumerate(Mis):
-#    Mfs[i] = calcMoft(np.array([t0]), Mi*eVperg, Ned, 10e12, odeMethod = 'BDF')[0]/eVperg #Black hole masses in eV
-#    print('%.10e\t%.2e'%(Mi,Mfs[i]))
-#output=np.array([Mis,Mfs]).T
-#np.savetxt('MbhInitialtoTodayMapping_%d.csv'%Ned,output,delimiter=',')
-#Mbh = 4.9e14*eVperg
-#t0 = 4.354e17
-#lt = lifetime(Mbh, Ned)
-#print(lt)
-#while lt <  t0:
-#    Mbh += 0.001e14*eVperg
-#    lt = lifetime(Mbh, Ned)
-#    print('%.3e\t%.3e'%(Mbh/eVperg, lt))
-#plt.show()
+if __name__ == '__main__':
+    main()
 
-
-#main()
-
-#T_eV = 30e6
-#M = 1 / (8*pi*G_eV*T_eV)
-n = 2
-M = 1e22
-
-T_GeV = get_temperature_from_mass(M,2,10e3)
-print(T_GeV*1e9)
-#E = np.logspace(3,9.5,100)
-#dNdEdt = dNgamdotdE(M, E, 0, Mstar=10e12, primaryOnly=False) / hbar 
-#plt.loglog(1e-9*E, 1e-9*np.power(E,2)*dNdEdt, label='Us')
-
-##carr = np.loadtxt('CarrSpec30MeV.csv',delimiter=',')
-##plt.loglog(carr[:,0], carr[:,1], label='Carr')
-
-#chen = np.loadtxt('ChenSpec1e15g.csv',delimiter=',')
-#plt.loglog(chen[:,0], chen[:,1], label='Chen (BlackHawk 2.0)')
-
-#plt.legend()
-#plt.title('M = 1e15 g')
-#plt.xlabel('E (GeV)')
-#plt.ylabel('E$^2$ dN/dEdt [GeV/s]')
-##plt.xlim([2e7, 5e8])
-#plt.ylim([1e13, 1e19])
-#plt.show()
