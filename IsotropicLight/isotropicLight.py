@@ -25,7 +25,6 @@ pi = np.pi
 
 ztSetup = False #indicates whether data for z(t) interpolation has been setup
 spectrumSetup = False #indicates whether data for photon spectrum interpolation has been setup
-tauSetup = False #indicates whether data for optical depth interpolation has been setup
 icsSetup = False #indicates whether data for ICS interpolation has been setup
 Tref_ics = 0.01 #Reference temperature used for ics calculating in eV
 
@@ -51,10 +50,6 @@ G_eV = 1/Mpl**2 #Gravitational constnat in eV^-2
 
 LamQCD = 300e6 #QCD cutoff
 
-#arxiv:1912.04296v2
-#rhoEarth_GeVcm3 = 0.6 #DM density near earth in GeV/cm^3
-#rNFW = 32 #Milky Way NFW fit radius kpc
-#gNFW = 0.95 #Slope of Milky Way NFW profile
 #https://iopscience.iop.org/article/10.1088/1475-7516/2019/10/037/pdf
 rhoEarth_GeVcm3 = 0.3 #DM density near earth in GeV/cm^3
 rNFW = 9 #Milky Way NFW fit radius kpc
@@ -65,17 +60,6 @@ gNFW = 1.2 #Slope of Milky Way NFW profile
 #arxiv:1807.09409
 rEarth = 8.127 #kpc
 
-##NFW values used in Siegert et al
-#rNFW = 9.98
-#rsum1 = rNFW + rEarth
-#rhoEarth_GeVcm3 = 1.2341095 / 4 / (rEarth*np.power(rsum1,2)/(4*np.power(rNFW,3)))
-#gNFW = 1
-#h = .6736
-#rhoc0_gcm3 = 9.1e-30
-#Omdm = 0.2645
-#OmL = 0.6847
-#Omr = 0
-#print(rhoEarth_GeVcm3)
 
 #Physical Constants and Unit Conversions
 sigmaT_eV = 1.70847747e-15 #Thompson cross-section in eV^-2
@@ -94,7 +78,6 @@ GeVperMeV = 1e-3 #GeV/MeV
 MpcperGpc = 1e3
 speryear = 3.154e7 #seconds/year
 kB = 8.617330e-5 #eV/K
-
 
 def calcDimensionRadius(Ned, Mstar):
     """Returns the size of the extra dimensions
@@ -134,10 +117,8 @@ def isMacroscopic(Mpbh, Ned, Mstar):
 
     R = calcDimensionRadius(Ned, Mstar)
     M_g = Mpbh/eVperg
-    #rbh = get_radius_from_mass(M_g, Ned, Mstar*GeVpereV)*GeVpereV #bh radius in eV^-1
     rbh = 2*Mpbh / Mpl**2
-    #print(R)
-    #print(rbh)
+
     output = False
     if R < rbh:
         output = True
@@ -173,30 +154,6 @@ def setupzt():
     print('setting up zoft')
     tz = np.loadtxt('zvst.csv',delimiter=',')
     ztSetup = True
-    return
-
-def setupTauInterpolation():
-    """Reads in data from tauData folder and sets up
-    function tauInterp. Interpolated function takes in Energy (eV)
-    and redshift
-
-    Parameters
-    ----------
-
-    Returns
-    -------
-        
-    """
-    global tauInterp, tauSetup
-    print('setting up tau Interpolation')
-
-    Es = np.loadtxt('tauData/Eaxis.txt',delimiter=',',skiprows=0)
-    zs = np.loadtxt('tauData/zaxis.txt',delimiter=',',skiprows=0)
-    tauData = np.loadtxt('tauData/tau IonCut6.txt',delimiter=',',skiprows=0).T
-
-    tauInterp = interp2d(Es, zs, tauData)
-
-    tauSetup = True
     return
 
 def setupICSInterpolation():
@@ -357,38 +314,6 @@ def dNgamdotdEpri4D(MpbhIn, E):
     E0 = 6.54e-5 /GeVpereV
     denominator = np.power(M18*E/E0,-2.7) + np.power(M18*E/E0,6.7)
     return 2.5e21 *hbar *GeVpereV / denominator
-
-    if isinstance(MpbhIn, np.ndarray):
-        Mpbh = MpbhIn
-    else:
-        Mpbh = np.ones_like(E)*MpbhIn    
-
-    T = Thawk4D(Mpbh) #Hawking temperature
-    
-    #This is the low E limit
-    Q = 0 #No Charge
-    a = 0 #Non-rotating
-    rplus = Mpbh + (Mpbh**2 - Q**2 - a**2)**0.5
-    k = 2*pi*T
-    A = 4*pi * (rplus - Mpbh) / k
-    sigma1 = 4.*A*(3*Mpbh**2 - a**2)*E**2 / 9.*G_eV**3
-
-    #This is the high E limit (geometric limit)
-    sigmag = 27*pi*G_eV**2 * Mpbh**2 #Absorption cross section
-
-    #Mix between high E limit and low E limit
-    r = (10*Mpbh*E*G_eV + E/T)/11
-    sigmamix = r**2*sigmag + (1-r)**2*sigma1
-    
-    sigma = np.minimum.reduce([sigmamix, sigmag])
-
-    #ratio = np.minimum(E/T, 100)
-    ratio = E/T
-    denominator = (np.exp(ratio) - 1)*2*pi**2
-    numerator = E**2 * sigma
-
-    #where there is no temperature emit nothing
-    return np.where(T==-1,0,numerator/denominator)
 
 def dNelecdotdESingleM(Mpbh, E, Ned, Mstar=10e12):
     """\\frac{dN_\\electron}{dEdt}, the differential number
@@ -950,122 +875,6 @@ def bhDensity(fdm, M0):
     rhoDM = Omdm * rhoc0_gcm3 *(hbar*c/mpercm)**3 * eVperg
     return fdm*rhoDM/M0
 
-def gamDensity(fdm, zs, Ms, E, Ned, Mstar, M0, primaryOnly=False):
-    """Calculates the number density of photons today
-    at energy E (eV) per unit energy from black hole that has masses Ms (eV) at redshifts 1 + zs.
-    
-    This accounts for redshiffting of photons and absorption of photons as
-    the only effects between the emission of photons and observation today.
-
-    This determines the photon density by integrating over redshifts
-
-    Parameters
-    ----------
-    fdm  : float
-        Fraction of dark matter initially comprised of PBH
-    zs   : numpy array
-        List of redshifts (minus 1). Should be ordered from largest to smallest
-    Ms   : numpy array (same size as zs)
-        Mass of black holes at each value of zs (eV)
-    E    : float
-        Energy from the photon spectrum to be evaluated at
-    Ned  : int
-        Number of large extra dimensions. The default value is 0 for 4D case  
-    Mstar: float
-        Scale of gravity (eV). Irrelevant for 4D case but must be set in case
-        with Ned > 0
-    M0   : float
-        Mass of the black holes when created (eV)
-    primaryOnly: boolean
-        If true, only include primary photons    
-
-    Returns
-    -------
-    float
-        Number density of photons today in eV^2
-    """
-    if not tauSetup:
-        setupTauInterpolation()
-    taus = np.flip(tauInterp(E, zs)[:,0])
-
-    npbh = bhDensity(fdm, M0) #PBH number density today eV^3
-
-    dndz = -npbh * dNgamdotdE(Ms, (1+zs)*E, Ned, Mstar, primaryOnly) / H(zs) * np.exp(-taus)
-    #print('TAUS EXCLUDED')
-
-    return np.trapz(dndz, zs)
-
-def intensity(fdm, zs, Ms, E, Ned, Mstar, M0, primaryOnly=False):
-    """Calculates the Intensity of photons at energy E (eV) today
-     in $cm^{-2} s^{-1} sr^{-1}GeV^{-1}$ from black hole that has
-     masses Ms (eV) at redshifts 1 + zs.
-    
-    This accounts for redshiffting of photons and absorption of photons as
-    the only effects between the emission of photons and observation today.
-
-    This determines the intensity by integrating over redshifts. See extraGalacticIntensity
-    for a function that determiens the intensity by tracking the spectrum at each
-    redshift
-
-    Parameters
-    ----------
-    fdm  : float
-        Fraction of dark matter initially comprised of PBH
-    zs   : numpy array
-        List of redshifts (minus 1). Should be ordered from largest to smallest
-    Ms   : numpy array (same size as zs)
-        Mass of black holes at each value of zs
-    E    : float
-        Energy from the photon spectrum to be evaluated at
-    Ned  : int
-        Number of large extra dimensions. The default value is 0 for 4D case  
-    Mstar: float
-        Scale of gravity (eV). Irrelevant for 4D case but must be set in case
-        with Ned > 0
-    primaryOnly: boolean
-        If true, only include primary photons    
-    Returns
-    -------
-    float
-        Intensity of photons in $cm^{-2} s^{-1} sr^{-1} GeV^{-1}$
-    """
-    ngam = gamDensity(fdm, zs, Ms, E, Ned, Mstar, M0, primaryOnly) #gamma density in eV^2
-    return ngam / (4*pi) / hbar**3 / c**2 * mpercm**2 / GeVpereV
-
-def maxIntensityJohnson():
-    """OLD!!! Outputs array with measured values of photon intensity.
-    The data is digitized from a plot in arxiv:2005.07467v1
-
-    Parameters
-    ----------
-    
-    Returns
-    -------
-    2D numpy array
-        First column - Energies in eV of the intensity measurements
-        Second column- Intensity of photons in $cm^{-2} s^{-1} sr^{-1}$
-    """
-    egret = np.loadtxt('GammaData/EGRET.csv',delimiter=',')
-    fermiLAT = np.loadtxt('GammaData/FERMI-LAT.csv',delimiter=',')
-    comptel = np.loadtxt('GammaData/COMPTEL.csv', delimiter=',')
-    moretti = np.loadtxt('GammaData/Moretti Fit.csv',delimiter=',')
-
-    #combine energies into 1 column (data initialy in GeV)
-    EsGeV = egret[:,0]
-    EsGeV = np.append(EsGeV, fermiLAT[:,0])
-    EsGeV = np.append(EsGeV, comptel[:,0])
-    EsGeV = np.append(EsGeV, moretti[:,0])    
-    
-    Es = EsGeV*1e9 #eV
-
-    #Combine intensitites into one column
-    I = egret[:,1]
-    I = np.append(I, fermiLAT[:,1])
-    I = np.append(I, comptel[:,1])
-    I = np.append(I, moretti[:,1])    
-    
-    return np.array([Es,I]).T
-
 def maxIntensity(sigmaBound = 2, useAjello = True, plot=False):
     """Outputs array with measured values of photon intensity.
 
@@ -1328,23 +1137,10 @@ def maxfdm(M0, Ned, Mstar, includeICSSpec=True, includePositronSpec=True, includ
     obsIf1 = [np.trapz(If1[np.all(np.array([Es>Emins[i], Es < Emaxs[i]]),axis=0)], Es[np.all(np.array([Es>Emins[i], Es < Emaxs[i]]),axis=0)]) for i in range(Emins.size)]
     obsIf1 /= binWidths
 
-#    index = (np.where(Es > 511e3))[0]
-#    print(Es[index[0]])
-#    print(If1[index[0]])
-#    print(If1[index[0]-1])
-#    print(If1[index[0]+1])
-#    Ipeak = If1[index[0] -1]
-#    index2 = (np.where(Ebins > 511e3))[0]
-
-#    obsIf1 = np.interp(Ebins, Es, If1)    
-#    obsIf1[index2[0]] = Ipeak
-
     If1 = obsIf1
     ratios = If1/Ilimit
 
     plt.loglog(Ebins, If1/np.max(ratios),'b.')
-
-    #np.savetxt('N%d M%e spectrum.txt',np.array([Es,If1Calc]).T)
 
     return 1/np.max(ratios)
 
@@ -1428,7 +1224,6 @@ def dTau(E, z, dz, includeCompton=False):
         Differential absorption rate over a redshift step
     """
     if type(E) == np.ndarray:
-        #dtdl = np.zeros(E.size)
         NE = E.size
         cE = E.ctypes.data_as(POINTER(c_double))
         cdtdzs = np.zeros(NE,dtype=np.float64).ctypes.data_as(POINTER(c_double))
