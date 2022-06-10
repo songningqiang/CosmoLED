@@ -1651,9 +1651,6 @@ def extraGalacticIntensity(fdm, zs, Ms, Es, Ned, Mstar, M0, primaryOnly = False,
         Differential intensity of photons in $cm^{-2} s^{-1} sr^{-1} GeV^{-1}$ 
         for each energy in Es
     """
-    print('NEgamcompton = %d'%NEgamCompton)
-    print('NEgam = %d'%NEgam)
-
     if comptonTreatment != 'Ignore' and \
         comptonTreatment != 'Attenuate' and \
         comptonTreatment != 'FracEloss' and \
@@ -1853,6 +1850,9 @@ def galacticIntensity(Es, fdm0, M, Ned, Mstar, rhoEarth_eV, rNFW_eV, rEarth_eV, 
     return ngam / (4*pi) / hbar**3 / c**2 * mpercm**2 / GeVpereV
 
 def mainScan():
+    """
+    Main function used for determing max_fdm for a scan over varying black hole mass for n=2-6 extra dimensions
+    """
     Mstar = 10e12 #Scale of quantum gravity in eV
     Mstar_GeV = 10e3
     print('Using Mstar = %1e GeV'%Mstar_GeV)
@@ -1860,24 +1860,37 @@ def mainScan():
     ans = input('Do you want to include positron annihilation? (y/n)')
     if ans == 'y' or ans == 'Y':
         usePositrons = True
+        print('Positron annihilations are included')
     else:
         usePositrons = False
+        print('Positron annihilations are being ignored')
         
     ans = input('Do you want to include inverse Compton scattering? (y/n)')
     if ans == 'y' or ans == 'Y':
         useICS = True
+        print('Inverse Compton scattering is included')
     else:
         useICS = False
+        print('Inverse Compton scattering is being ignored')
         
     ans = input('Do you want to include the isotropic galactic component? (y/n)')
     if ans == 'y' or ans == 'Y':
         useGalaxy = True
+        print('Isotropic galactic signal is included')
     else:
         useGalaxy = False
+        print('Isotropic galactic signal is ignored')
 
     useAjello = True #whether this scan should use Marco Ajello's Data
 
-    comptonMethod = 'FullWhenEvaporated'
+    ans = input('Do you want to specify an approximation for Compton scattering? (y/n)')
+    if ans == 'y' or ans == 'Y':
+        ans = input('Which Compton scattering calculation method would you like to use? Note: this answer is case sensitive (Ignore/Attenuate/FracEloss/Full/FullWhenEvaporated)')
+        comptonMethod = ans
+        print('%s method used for Compton scattering calculation'%comptonMethod)
+    else:
+        comptonMethod = 'FullWhenEvaporated'
+        print('FullWhenEvaporated method used for Compton scattering calculation')
 
     Neds = [2, 3, 4, 5, 6] #Numbers of extra dimensions
     logMmins = [4, 7, 9, 10, 12] #log10 of the smallest BH mass for each Ned in grams
@@ -1917,12 +1930,64 @@ def mainScan():
         fileName += comptonMethod
         fileName += '.csv'
         np.savetxt(fileName,np.array([Mgs,initfdms]).T,delimiter=',')
+        return
     
 def mainIndividual():
+    """
+    Main function used for determing max_fdm for a single black hole mass
+    """
+    Mstar = 10e12 #Scale of quantum gravity in eV
+    Mstar_GeV = 10e3
+    print('Using Mstar = %1e GeV'%Mstar_GeV)
+    
+    ans = input('Do you want to include positron annihilation? (y/n)')
+    if ans == 'y' or ans == 'Y':
+        usePositrons = True
+        print('Positron annihilations are included')
+    else:
+        usePositrons = False
+        print('Positron annihilations are being ignored')
+        
+    ans = input('Do you want to include inverse Compton scattering? (y/n)')
+    if ans == 'y' or ans == 'Y':
+        useICS = True
+        print('Inverse Compton scattering is included')
+    else:
+        useICS = False
+        print('Inverse Compton scattering is being ignored')
+        
+    ans = input('Do you want to include the isotropic galactic component? (y/n)')
+    if ans == 'y' or ans == 'Y':
+        useGalaxy = True
+        print('Isotropic galactic signal is included')
+    else:
+        useGalaxy = False
+        print('Isotropic galactic signal is ignored')
+
+    useAjello = True #whether this scan should use Marco Ajello's Data
+
+    ans = input('Do you want to specify an approximation for Compton scattering? (y/n)')
+    if ans == 'y' or ans == 'Y':
+        ans = input('Which Compton scattering calculation method would you like to use? Note: this answer is case sensitive (Ignore/Attenuate/FracEloss/Full/FullWhenEvaporated)')
+        comptonMethod = ans
+        print('%s method used for Compton scattering calculation'%comptonMethod)
+    else:
+        comptonMethod = 'FullWhenEvaporated'
+        print('FullWhenEvaporated method used for Compton scattering calculation')
+        
+    M_g = float(input('What is the initial black hole mass in grams?'))
+    M = M_g * eVperg
+    
+    Ned = int(input('How many large extra dimensions are there?'))
+    
+    maxf = maxfdm(M, Ned, Mstar, includeICSSpec = useICS, includeGalactic =useGalaxy, includePositronSpec=usePositrons, useAjello=useAjello, comptonTreatment = comptonMethod)
+    print('\n\nThe maximum initial fraction of dark matter comprised of these PBHs is: %g\n\n'%maxf)
     return
 
 if __name__ == '__main__':
     ans = input('Do you want to do a full scan of black hole mass and number of extra dimensions (y/n)')
     if ans == 'y' or ans == 'Y':
         mainScan()
+    else:
+        mainIndividual()
 
