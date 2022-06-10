@@ -1852,13 +1852,29 @@ def galacticIntensity(Es, fdm0, M, Ned, Mstar, rhoEarth_eV, rNFW_eV, rEarth_eV, 
     ngam = fdm0/M * injSpec * Dmin #eV^2
     return ngam / (4*pi) / hbar**3 / c**2 * mpercm**2 / GeVpereV
 
-def main():
+def mainScan():
     Mstar = 10e12 #Scale of quantum gravity in eV
     Mstar_GeV = 10e3
+    print('Using Mstar = %1e GeV'%Mstar_GeV)
+    
+    ans = input('Do you want to include positron annihilation? (y/n)')
+    if ans == 'y' or ans == 'Y':
+        usePositrons = True
+    else:
+        usePositrons = False
+        
+    ans = input('Do you want to include inverse Compton scattering? (y/n)')
+    if ans == 'y' or ans == 'Y':
+        useICS = True
+    else:
+        useICS = False
+        
+    ans = input('Do you want to include the isotropic galactic component? (y/n)')
+    if ans == 'y' or ans == 'Y':
+        useGalaxy = True
+    else:
+        useGalaxy = False
 
-    usePositrons = True #whether this scan should include the effect of positronium
-    useICS = False #whether this scan should include the effect of ICS
-    useGalaxy = True #whether this scan should use contribution of MW Halo
     useAjello = True #whether this scan should use Marco Ajello's Data
 
     comptonMethod = 'FullWhenEvaporated'
@@ -1881,10 +1897,10 @@ def main():
             print("M = %e g   Max fdm_i = %g"%(M_g, initfdms[i]))
 
         fileName = '%d Ned Constraint'%Ned
-        if useAjello:
-            fileName += ' AjelloData'
-        else:
-            fileName += ' OtherData'
+#        if useAjello:
+#            fileName += ' AjelloData'
+#        else:
+#            fileName += ' OtherData'
         if useICS:
             fileName += ' with ICS'
         else:
@@ -1902,7 +1918,11 @@ def main():
         fileName += '.csv'
         np.savetxt(fileName,np.array([Mgs,initfdms]).T,delimiter=',')
     
+def mainIndividual():
+    return
 
 if __name__ == '__main__':
-    main()
+    ans = input('Do you want to do a full scan of black hole mass and number of extra dimensions (y/n)')
+    if ans == 'y' or ans == 'Y':
+        mainScan()
 
