@@ -1,0 +1,4 @@
+This folder contains data from x-ray and gamma ray telescopes compiled and provided by Marco Ajello. This compilation of data was originailly presented in the paper:
+M. Ajello et al., “Cosmic X-ray background and Earth albedo Spectra with Swift/BAT,” Astrophys. J. 689, 666 (2008), arXiv:0808.3377 [astro-ph].
+
+To use additional or different data for the isotropic light constraints, edit the maxIntensity() function in isotropicLight.py to ensure the new data is being read.
