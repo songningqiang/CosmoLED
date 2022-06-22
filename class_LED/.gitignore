@@ -1,0 +1,37 @@
+*~
+build/
+class
+*.prof
+libclass.a
+*out
+python/classy.c
+*.pyc
+python/build/
+DM_Annihilation/
+DM_decay_files/
+DM_annihilation_old/
+DM_decay_files_old/
+output_mai/
+output_avril/
+*.dat
+output_	*
+class.dSYM/Contents/Info.plist
+test/
+*.p
+script*
+sfr.dat
+*.png
+
+# CosmoRec
+*.o
+libCosmoRec.a
+cosmorec_lite/CosmoRec
+cosmorec_lite/Development/Cosmology/Recfast++/Recfast++
+output_*
+output/*
+root_ini_files/
+class.dSYM/*
+cosmorec/
+
+RealSpaceInterface/cache/
+.DS_Store

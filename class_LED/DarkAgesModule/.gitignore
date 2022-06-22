@@ -1,0 +1,10 @@
+*.pyc
+*.dat
+*.obj
+
+sphinx-documentation/_build
+sphinx-documentation/_static
+
+examples/.ipynb_checkpoints/
+
+setup.py

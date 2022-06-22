@@ -1,0 +1,215 @@
+#!/usr/bin/env python
+
+from __future__ import absolute_import, division, print_function
+
+import os
+import sys
+import optparse
+import numpy as np
+from numpy.random import randint
+
+def cb_string(option, opt_str, value, parser):
+	args=[]
+	for arg in parser.rargs:
+		if arg[0] != "-":
+			args.append(arg)
+		else:
+			del parser.rargs[:len(args)]
+			break
+	if getattr(parser.values, option.dest):
+		args.extend(getattr(parser.values, option.dest))
+	setattr(parser.values, option.dest, args)
+
+def cb_float(option, opt_str, value, parser):
+	args=[]
+	for arg in parser.rargs:
+		if arg[0] != "-":
+			args.append(float(arg))
+		else:
+			del parser.rargs[:len(args)]
+			break
+	if getattr(parser.values, option.dest):
+		args.extend(getattr(parser.values, option.dest))
+	setattr(parser.values, option.dest, args)
+
+random_num = randint(1000)
+root_path = os.path.split(os.path.dirname(os.path.realpath( __file__ )))[0]
+VERSION_FILE_NAME = os.path.join( root_path, 'VERSION')
+
+with open(VERSION_FILE_NAME, 'r') as version_file:
+    VERSION = version_file.readline().strip()
+
+sys.path.insert(0, root_path)
+
+usage = "usage: %prog [options] [FILE] "
+parser = optparse.OptionParser(usage=usage, version="%prog {0}".format(VERSION))
+
+parser.add_option("-f", "--file", default = None, dest='script_file',
+                  help="Use script file FILE")
+parser.add_option("-s", "--spectrum", default= None , metavar='SPECTRUM', action="callback", callback=cb_string, dest = 'spectrum',
+                  help="Use the spectrum provided in SPECTRUM. This is a whitespace-separated list of either the path to a table with reference spectra, or a known keyword refering to the spectra provided in PPPC4DMID or dirac-like injections.")
+parser.add_option("--specfile", default= None , metavar='SPECFILE', action="callback", callback=cb_string, dest = 'specfile',
+                  help="Use the spectrum provided in SPECFILE (This is deprecated and will be disabled)")
+parser.add_option("-b","--branching", metavar='BRANCHING', action='callback', callback=cb_float, dest = 'branchings',
+                  help="If using more than one spectrum specify the branching ratio")
+parser.add_option("--model", dest='model', metavar='MODEL',
+                  help="Load a preprocessed model")
+parser.add_option("--rebuild-model", action='store_true', dest='rebuild_model', default=False,
+                  help="Force rebuilding a model")
+parser.add_option("--hist", default='annihilation', choices=['annihilation','annihilation_halos','decay','evaporating_PBH','accreting_PBH'], dest='injection_history',
+                  help="Define the injection history of the model.")
+parser.add_option("-m","--mass", type="float", dest='mass',
+                  help="Define the mass of the DM-candidate [in GeV] or the PBH mass [in g for evaporating PBH and Msun for accreting ones].")
+parser.add_option("--Log10Emin", type='float', dest='Log10Emin',
+                  help="Minimal energy for the convolution over tranfer functions. Default set to 5keV (minimal energy of the tables).")
+parser.add_option("--Log10Emax", type='float', dest='Log10Emax',
+                  help="Maximal energy for the convolution over tranfer functions. Default set to 1TeV (maximal energy of the tables).")
+parser.add_option("--nbins_table", type='float', dest='nbins_table',
+                  help="Number of energy points for the convolution over tranfer functions. Default set to 40 (the number of points in the transfer function tables).")
+parser.add_option("--accretion_recipe",dest="accretion_recipe",choices=['spherical_accretion','disk_accretion'],
+                  help = "Define the accretion recipe used to compute the energy injection associated to accreting PBH: disk_accretion or spherical_accretion.")
+parser.add_option("--log10mass", type="float", dest='log10mass',default=None,
+                  help="Define the log10 of the mass of the DM-candidate [mass in GeV].")
+parser.add_option("--tdec", type='float', dest='t_dec',
+                  help="Define the lifetime of the DM-candidate.")
+parser.add_option("--zh", type='float', dest='zh',
+                  help="Define the onset of halos formation.")
+parser.add_option("--fh", type='float', dest='fh',
+                  help="Define the amplitude of DM halos.")
+parser.add_option("", "--use-background", dest="background", nargs=3, type="float", default=(67.27, 0.3156, 8e-5),
+                  help="Define the background parameters (H0, Omega_m, Omega_r) for the calculation of H(z) and t(z)")
+parser.add_option("--extra-options", dest="extra", metavar="EXTRA.yaml",
+                  help="Yaml-File with additional parameters")
+parser.add_option("--nuke-and-start-again", action='store_true', dest='nuke', default=False,
+                  help="Delete all preprocessed *.obj-files (transfer-functions, dumped interpolators, models, etc.) and start from scratch")
+parser.add_option("--return_f_eff_table", action='store_true', dest='return_feff', default=False,
+                  help="Print f(z) summed over all deposition channels (with corrections) instead of each channel")
+
+(options, args) = parser.parse_args()
+if len(args) == 0:
+    args = ''
+
+# !!! DANGER ZONE !!!
+if options.nuke:
+	# go to the models-folder, loop through all models and delete all *.obj
+	head = os.path.join(root_path,'models')
+	for folder in os.listdir(head):
+		for f in os.listdir( os.path.join(head,folder) ):
+			if f.endswith('.obj'): os.remove(os.path.realpath( os.path.join(head,folder,f)))
+	# go to the transfer_functions folder and delete all *.obj
+	folder = os.path.join(root_path,'transfer_functions')
+	for f in os.listdir(folder):
+		if f.endswith('.obj'): os.remove(os.path.realpath( os.path.join(folder,f)))
+	# Now delete the dumped interpolators in DarkAges/data/{cirelli,simple_decay_spectra}
+	folder = os.path.join(root_path,'DarkAges','data','cirelli')
+	for f in os.listdir(folder):
+		if f.endswith('.obj'): os.remove(os.path.realpath( os.path.join(folder,f)))
+	folder = os.path.join(root_path,'DarkAges','data','simple_decay_spectra')
+	for f in os.listdir(folder):
+		if f.endswith('.obj'): os.remove(os.path.realpath( os.path.join(folder,f)))
+# !!! END OF DANGER ZONE !!!
+
+if options.specfile is not None:
+#	from warnings import warn
+#	warn('The use of --specfile is deprecated and will be disabled. Please use --spectrum or -s', UserWarning)
+	options.spectrum = options.specfile
+	options.specfile = None
+
+from DarkAges.__init__ import transfer_functions, get_logEnergies, set_logEnergies, get_redshift, DarkAgesError, print_info, set_background, get_background
+import DarkAges.recipes as recipes
+
+set_background(*options.background)
+
+if options.nbins_table is not None or options.Log10Emin is not None or options.Log10Emax is not None:
+	tmp_logE = get_logEnergies()
+	if options.nbins_table is None: options.nbins_table = tmp_logE.__len__()
+	if options.Log10Emin is None: options.Log10Emin = tmp_logE.min()
+	if options.Log10Emax is None: options.Log10Emax = tmp_logE.max()
+	set_logEnergies(np.linspace(options.Log10Emin,options.Log10Emax,options.nbins_table))
+	del tmp_logE
+
+DarkOptions = dict()
+
+if options.extra is not None:
+	import yaml
+	with open(options.extra, 'r') as stream:
+		additional_DarkOptions = yaml.safe_load(stream)
+		DarkOptions.update(additional_DarkOptions)
+		del additional_DarkOptions
+
+if options.script_file is not None:
+	os.environ['DARKAGES_TOPLEVEL_PID'] = '{:d}'.format(os.getpid())
+	os.environ['DARKAGES_TOPLEVEL_RANDN'] = '{:d}'.format(random_num)
+	dumpDict = dict()
+	dumpDict.update(DarkOptions)
+	dumpDict.update({'background_H0':options.background[0], 'background_Omega_m': options.background[1], 'background_Omega_r' :options.background[2]})
+	import yaml
+	with open(os.path.join( os.environ['DARKAGES_BASE'], 'pid_{:d}_{:d}.yaml'.format(os.getpid(), random_num )), 'w') as options_dumper:
+		yaml.safe_dump(dumpDict, options_dumper)
+
+import atexit
+@atexit.register
+def goodbye():
+	if options.script_file is not None:
+		try:
+			os.remove( os.path.join( os.environ['DARKAGES_BASE'], 'pid_{:d}_{:d}.yaml'.format(os.getpid(), random_num )) )
+		except OSError:
+			pass
+
+if options.injection_history == 'decay' and (options.t_dec is None):
+	raise DarkAgesError('With choosing the injection history: "decay" you need to specify the lifetime of the DM-candidate with "--tdec"','Missing input')
+
+if options.model is not None and options.script_file is not None:
+	raise DarkAgesError('You used --file (-f) ... and --model ... in your input. That is a very confusing demand. Please choose only one option.','Missing input')
+
+if options.model is not None:
+	sys.exit( recipes.access_model(options.model, options.rebuild_model, *args, **DarkOptions) )
+
+if options.script_file is not None:
+	sys.exit( recipes.execute_script_file(options.script_file, args) )
+
+if options.log10mass is not None:
+	if options.mass is None:
+		options.mass = 10**options.log10mass
+		print_info('Setting mass to {:.2e}'.format(options.mass))
+		options.log10mass = None
+	else:
+		raise DarkAgesError("Huh?? I'm confused. You gave --mass and --log10mass. Please choose only one of both and choose wisely!")
+
+# If neither options.model or options.script_file is set f(z) should be derived from scratch.
+# For next steps the mass need to be set. Stop if the mass is not given.
+# (At this point we also catch the case when the script is executed with no options, which is a pointless thing to do)
+if options.mass is None:
+	raise DarkAgesError("You are new here, right? At least it seems that executed the script without any options. Re-run with --help to see what the script can do or check out the documentation.\n\nIn case you are familiar with the usage of that script, this message means the following to you:\nYou did not specified the options --file and --model in the input, hence I assume you want me to calculate f(z) live from scratch. But to do so the mass is missing and without it I cannot proceed. Use either --mass or --log10mass (and please do not use both)")
+
+if options.mass <= 0:
+	raise DarkAgesError('You entered an invalid value for the mass. It needs to be positive and non zero.')
+
+# For the following recipes either print the table of all deposition channels or the sum (with corrections) as f_eff(z)
+# If the option is already set via the YAML input the command-line input is ignored.
+if "print_f_eff" not in DarkOptions:
+	DarkOptions.update({"print_f_eff":options.return_feff})
+
+if options.injection_history == 'evaporating_PBH':
+	sys.exit( recipes.evaporating_PBH(options.mass, transfer_functions, **DarkOptions) )
+
+if options.injection_history == 'accreting_PBH' and ((options.accretion_recipe is None)):
+	raise DarkAgesError('When choosing the injection history: "accreting_PBH" you need to specify the accretion recipe: spherical_accretion or disk_accretion.')
+if options.injection_history == 'accreting_PBH':
+	sys.exit( recipes.accreting_PBH(options.mass, options.accretion_recipe, transfer_functions, **DarkOptions) )
+
+if options.spectrum is not None:
+	if options.branchings is None:
+		options.branchings = np.ones((1,))
+	else:
+		options.branchings = np.asarray(options.branchings)
+	try:
+		assert abs(sum(options.branchings) - 1) <= 1e-9
+	except AssertionError:
+		raise DarkAgesError('The branching ratios do not add up to one')
+	try:
+		assert len(options.spectrum) == len(options.branchings)
+	except AssertionError:
+		raise DarkAgesError('The number of spectra (== {:d}) and the number of branching ratios (== {:d}) do not match'.format(len(options.spectrum),len(options.branchings)))
+
+	sys.exit( recipes.loading_from_specfiles(options.spectrum, transfer_functions, options.mass, t_dec=options.t_dec, zh=options.zh, fh=options.fh, hist=options.injection_history, branchings=options.branchings, **DarkOptions) )
