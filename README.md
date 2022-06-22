@@ -21,7 +21,7 @@ dims: number of extra dimensions, can choose from 0 to 6.
 mpl: bulk Planck scale in GeV. When --dims=0, set mpl=Mpl, mpl or 1.22e19 to deal with traditional 4d black holes.
 outfile: the file to write in energy deposition functions.
 
-for a list of options available, one can try
+For a list of options available, one can try
 
 python DarkAgesModule/bin/DarkAges_LED --help
 
