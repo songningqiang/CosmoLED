@@ -7,13 +7,9 @@ The code is developed based on [ExoCLASS](https://github.com/lesgourg/class_publ
 DarkAges_LED requirements:
 
 numpy
-
 scipy
-
 PyYAML
-
 dill
-
 future
 
 DarkAges_LED can be used separately to obtain the energy deposition functions. For example, under class_LED folder, one can do
