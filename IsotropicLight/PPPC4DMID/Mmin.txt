@@ -1,7 +1,0 @@
-The minimum BH masses are listed below using BlackMax kn convention
-
-n = 2, Mmin = 1.08e9 g
-n = 3, Mmin = 1.87e12 g
-n = 4, Mmin = 5.28e14 g 
-n = 5, Mmin = 3.43e16 g
-n = 6, Mmin =  8.93e17 g

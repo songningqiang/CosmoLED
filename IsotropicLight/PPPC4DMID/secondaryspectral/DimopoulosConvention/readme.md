@@ -1,6 +1,6 @@
 About the code:
 
-1. Dimopoulos convention is implemented. See equation (3) of the overleaf draft.
+1. Dimopoulos convention is implemented. See equation (5) of https://arxiv.org/pdf/2201.11761.pdf
 
 2. Mstar = 10TeV is assumed for n>0, for n=0 Mstar=Mpl and we recover the 4d case.
 
