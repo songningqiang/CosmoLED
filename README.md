@@ -41,7 +41,7 @@ energy_deposition_function = DarkAges_LED
 DarkAges_mode = built_in
 ```
 
-input.c has been modified to allow PBH_fraction on log scale. To enable this feature, one can set log10_PBH_fraction = yes in the ini file and then set PBH_fraction = log10(PBH_fraction). By default log10_PBH_fraction = no.
+It is also possible to set PBH_fraction on log scale. To enable this feature, one can set log10_PBH_fraction = yes in the ini file and then set PBH_fraction = log10(PBH_fraction). By default log10_PBH_fraction = no.
 
 To use class _LED with MontePython, it is highly recommended to produce the energy deposition file prior to running MCMC, as calling the DarkAges_LED module each time is time consuming. Make sure the path of the file is correct. An example parameter file for MontePython using Planck 2018 data can be found as LED_6d_1e4_1e15g.param.
 
