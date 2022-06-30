@@ -1780,6 +1780,7 @@ def mainIndividual():
     return
 
 if __name__ == '__main__':
+    print(__doc__)
     ans = input('Do you want to do a full scan of black hole mass and number of extra dimensions (y/n)')
     if ans == 'y' or ans == 'Y':
         mainScan()
