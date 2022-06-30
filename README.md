@@ -53,11 +53,13 @@ The code for setting constraints on LED black holes using isotropic background l
 - scipy
 - ctypes
 
+Before running, the photon optical depth code must be compiled. This can be done by OpticalDepth folder and running Make all.
+
 The isotropicLight.py code can be run by calling
 ```
 python3 isotropicLight.py
 ```
-This will allow you to choose either to scan over all black hole masses and number of extra dimensions or find the constraint for a single value. The constraint calculation is only implemented currently for a bulk Planck scale of 10 TeV.
+This will allow you to choose either to scan over all black hole masses and number of extra dimensions or find the constraint for a single value. The constraint calculation is only implemented currently for a bulk Planck scale of 10 TeV. Constraints for traditional 4D primordial black holes can be obtained by choosing 0 for the number of extra-dimensions. In the case of 4D black holes, the bulk Planck scale is not used because it is assumed to be the observed 4D Planck scale.
 
 To see an example for how to use the code to directly calculate constraints see the functions mainIndividual and mainScan. A description of all the functions provided in isotropicLight.py can be found in documentation.txt.
 
