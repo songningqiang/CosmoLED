@@ -46,6 +46,7 @@ It is also possible to set PBH_fraction on log scale. To enable this feature, on
 To use class _LED with MontePython, it is highly recommended to produce the energy deposition file prior to running MCMC, as calling the DarkAges_LED module each time is time consuming. Make sure the path of the file is correct. An example parameter file for MontePython using Planck 2018 data can be found as LED_6d_1e4_1e15g.param.
 
 ## Instructions for IsotropicLight
+The code for setting constraints on LED black holes using isotropic background light can be found in the IsotropicLight folder.
 
 ## Using the code:
 
