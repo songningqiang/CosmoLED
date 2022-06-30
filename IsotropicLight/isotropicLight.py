@@ -13,12 +13,11 @@ from PPPC4DMID.spectrum_table_Dconvention import get_temperature_from_mass
 from PPPC4DMID.spectrum_table_Dconvention import get_mass_from_temperature
 from PPPC4DMID.spectrum_table_Dconvention import get_radius_from_mass
 from ctypes import *
-import time
 
-libodNoComptonTau = CDLL("./libodNoComptonTau.so")
+libodNoComptonTau = CDLL("./OpticalDepth/libodNoComptonTau.so")
 libodNoComptonTau.od_dtdz.restype = c_double
 
-libod = CDLL("./libod.so")
+libod = CDLL("./OpticalDepth/libod.so")
 libod.od_dtdz.restype = c_double
 
 pi = np.pi
@@ -1780,7 +1779,6 @@ def mainIndividual():
     return
 
 if __name__ == '__main__':
-    print(__doc__)
     ans = input('Do you want to do a full scan of black hole mass and number of extra dimensions (y/n)')
     if ans == 'y' or ans == 'Y':
         mainScan()
