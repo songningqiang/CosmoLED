@@ -46,8 +46,29 @@ It is also possible to set PBH_fraction on log scale. To enable this feature, on
 To use class _LED with MontePython, it is highly recommended to produce the energy deposition file prior to running MCMC, as calling the DarkAges_LED module each time is time consuming. Make sure the path of the file is correct. An example parameter file for MontePython using Planck 2018 data can be found as LED_6d_1e4_1e15g.param.
 
 ## Instructions for IsotropicLight
-The code for setting constraints on LED black holes using isotropic background light can be found in the IsotropicLight folder.
+
+The code for setting constraints on LED black holes using isotropic background light can be found in the IsotropicLight folder. The relevant code for the calculation is in the file isotropicLight.py which is dependent on the following python packages:
+- numpy
+- matplotlib
+- scipy
+- ctypes
+
+The isotropicLight.py code can be run by calling
+```
+python3 isotropicLight.py
+```
+This will allow you to choose either to scan over all black hole masses and number of extra dimensions or find the constraint for a single value. The constraint calculation is only implemented currently for a bulk Planck scale of 10 TeV.
+
+To see an example for how to use the code to directly calculate constraints see the functions mainIndividual and mainScan. A description of all the functions provided in isotropicLight.py can be found in documentation.txt.
+
+Calculation of particle spectra is reliant on interpolating tables from [A Poor Particle Physicist Cookbook for Dark Matter Indirect Detection (PPPC4DMID)](https://arxiv.org/abs/1012.4515). Those tables along with tables used to interpolate the black hole greybody factors, and some additional helpful functions for black hole evolution can be found in the folder PPPC4DMID.
+
+Setting constraints requires experimental data. All x-ray and gamma ray telescope data is in the folder AjelloData. This data contains observations from a large number of telescopes and was provided courtesy of Marco Ajello. Instructions for how to update the dataset used are also found in the folder AjelloData.
 
 ## Using the code:
 
 Feel free to use, modify or distribute the code. If you use the code in your publication, please cite the paper [https://arxiv.org/pdf/2201.11761.pdf](https://arxiv.org/pdf/2201.11761.pdf)
+
+Any use of the IsotropicLight code should also cite "M. Ajello et al., “Cosmic X-ray background and Earth albedo Spectra with Swift/BAT,” Astrophys. J. 689, 666 (2008), [arXiv:0808.3377](https://arxiv.org/abs/0808.3377) [astro-ph]." as the source of the collected X-ray and gamma ray background data provided by Marco Ajello. 
+
+Additionally, use of the IsotropicLight code should cite the PPPC4DMID paper: [arxiv:1812.4515](https://arxiv.org/abs/1012.4515) for use of the seconary particle spectra.
