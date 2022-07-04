@@ -9,37 +9,38 @@ CSLFLAGS = -shared -o
 # Note: EVERYTHING in this directory is killed by 'make clean' !!!
 
 BINDIR = ../bin/
+SRCDIR = OpticalDepth/
 
 all:
-	make lib.la
-	make libod.so
-	make libodNoComptonTau.so
+	make $(SRCDIR)lib.la
+	make $(SRCDIR)libod.so
+	make $(SRCDIR)libodNoComptonTau.so
 	#make comphy.o
 	#make od.o
 	
 clean:
-	rm *.o *.la *.so
+	rm $(SRCDIR)*.o $(SRCDIR)*.la $(SRCDIR)*.so
 #	rm $(BINDIR)*
 	
 	
 # ------ Libraries -----------------------------------------------------------#
 
-lib.la: comphy.o od.o
+$(SRCDIR)lib.la: $(SRCDIR)comphy.o $(SRCDIR)od.o
 	ar -cr $@ $^
 	
-libod.so: od.o
+$(SRCDIR)libod.so: $(SRCDIR)od.o
 	$(CC) $(CSLFLAGS) $@ $^
 	
-libodNoComptonTau.so: odNoComptonTau.o
+$(SRCDIR)libodNoComptonTau.so: $(SRCDIR)odNoComptonTau.o
 	$(CC) $(CSLFLAGS) $@ $^
     
 # ------ Individual modules --------------------------------------------------#
-comphy.o: comphy.c
+comphy.o: $(SRCDIR)comphy.c
 	$(CC) $(CCFLAGS) $^
 	
-od.o: od.c
+od.o: $(SRCDIR)od.c
 	$(CC) $(CCFLAGS) $^
 	
-odNoComptonTau.o: odNoComptonTau.c
+odNoComptonTau.o: $(SRCDIR)odNoComptonTau.c
 	$(CC) $(CCFLAGS) $^
 	
