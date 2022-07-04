@@ -59,7 +59,7 @@ The isotropicLight.py code can be run by calling
 ```
 python3 isotropicLight.py
 ```
-This will allow you to choose either to scan over all black hole masses and number of extra dimensions or find the constraint for a single value. The constraint calculation is only implemented currently for a bulk Planck scale of 10 TeV. Constraints for traditional 4D primordial black holes can be obtained by choosing 0 for the number of extra-dimensions. In the case of 4D black holes, the bulk Planck scale is not used because it is assumed to be the observed 4D Planck scale.
+This will allow you to choose either to scan over all black hole masses and number of extra dimensions or find the constraint for a single value. The constraint calculation is only implemented currently for a bulk Planck scale of 10 TeV. Constraints for traditional 4D primordial black holes can be obtained by choosing 0 for the number of extra-dimensions. In the case of 4D black holes, the bulk Planck scale is not used because it is assumed to be the observed 4D Planck scale. When running isotropicLight.py in its current form you will be prompted to choose an approximation for the Compton scattering calculation. An explanation of each calculation method can be found in Appendix D.2 of [the associated paper](https://arxiv.org/pdf/2201.11761.pdf).
 
 To see an example for how to use the code to directly calculate constraints see the functions mainIndividual and mainScan. A description of all the functions provided in isotropicLight.py can be found in documentation.txt.
 
