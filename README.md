@@ -2,7 +2,7 @@
 
 ## Instructions for class_LED
 
-The code is developed based on [ExoCLASS](https://github.com/lesgourg/class_public/tree/ExoCLASS). ExoCLASS and the DarkAges module are still usable in their vanilla way. Additional features are introduced with the DarkAges_LED module and the C codes in class_LED to compute the evolution and contribution from LED black holes. Greybody factors, lepton and meson decay tables are available in the class_LED/DarkAges/data folder.
+The code is developed based on [ExoCLASS](https://github.com/lesgourg/class_public/tree/ExoCLASS). ExoCLASS and the DarkAges module are still usable in their vanilla way. Additional features are introduced with the DarkAges_LED module and the C codes in class_LED to compute the evolution and energy deposition functions from LED black holes. Greybody factors, lepton and meson decay tables are available in the class_LED/DarkAges/data folder.
 
 DarkAges_LED requirements:
 - numpy
@@ -18,7 +18,7 @@ python DarkAgesModule/bin/DarkAges_LED --hist=evaporating_PBH --mass=1e+15 --dim
 where the different parameters are:
 - mass: the mass of black hole in grams.
 - dims: number of extra dimensions, can choose from 0 to 6.
-- mpl: bulk Planck scale in GeV. When --dims=0, set mpl=Mpl, mpl or 1.22e19 to deal with traditional 4d black holes.
+- mpl: bulk Planck scale in GeV. When --dims=0, set mpl=Mpl, mpl or 1.22e19 to deal with traditional 4D black holes.
 - outfile: the file to write in energy deposition functions.
 
 For a list of options available, one can try
