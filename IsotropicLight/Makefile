@@ -1,6 +1,6 @@
 # For C code files
 
-CC      = gcc-10
+CC      = gcc
 CCFLAGS = -Wall -c
 CLFLAGS = -lm -o
 CSLFLAGS = -shared -o
