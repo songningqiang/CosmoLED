@@ -73,4 +73,4 @@ Feel free to use, modify or distribute the code. If you use the code in your pub
 
 Any use of the IsotropicLight code should also cite "M. Ajello et al., “Cosmic X-ray background and Earth albedo Spectra with Swift/BAT,” Astrophys. J. 689, 666 (2008), [arXiv:0808.3377](https://arxiv.org/abs/0808.3377) [astro-ph]." as the source of the collected X-ray and gamma ray background data provided by Marco Ajello. 
 
-Additionally, use of the IsotropicLight code should cite the PPPC4DMID paper: [arxiv:1812.4515](https://arxiv.org/abs/1012.4515) for use of the seconary particle spectra.
+Additionally, use of the IsotropicLight code should cite the PPPC4DMID paper: [arxiv:1812.4515](https://arxiv.org/abs/1012.4515) for use of the secondary particle spectra.
