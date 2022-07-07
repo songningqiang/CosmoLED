@@ -53,7 +53,7 @@ The code for setting constraints on LED black holes using isotropic background l
 - scipy
 - ctypes
 
-Before running, the photon optical depth code must be compiled. This can be done by OpticalDepth folder and running Make all.
+The isotropic light constraints relies on photon optical depth code written by Katherine Mack and Daniel Wesley with explanations found in [arxiv:0805.1531](https://arxiv.org/abs/0805.1531). Before running the isotropicLight python code, the photon optical depth code must be compiled. This can be done by running Make all in the IsotropicLight folder.
 
 The isotropicLight.py code can be run by calling
 ```
