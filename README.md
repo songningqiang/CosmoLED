@@ -1,5 +1,7 @@
 # Cosmo code for Large Extra Dimension (LED) black holes
 
+This is a code to compute Hawking evaporation from black holes and set constraints on the fraction of black holes. Although the code is designed for large extra dimension black holes, 4D black holes can also be studied with a proper setup. The code also improves over the previous code in various aspects. Please see [https://arxiv.org/pdf/2201.11761.pdf](https://arxiv.org/pdf/2201.11761.pdf) for details.
+
 ## Instructions for class_LED
 
 The code is developed based on [ExoCLASS](https://github.com/lesgourg/class_public/tree/ExoCLASS). ExoCLASS and the DarkAges module are still usable in their vanilla way. Additional features are introduced with the DarkAges_LED module and the C codes in class_LED to compute the evolution and energy deposition functions from LED black holes. Greybody factors, lepton and meson decay tables are available in the class_LED/DarkAges/data folder.
