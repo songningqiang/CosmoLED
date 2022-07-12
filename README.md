@@ -1,6 +1,6 @@
 # Cosmo code for Large Extra Dimension (LED) black holes
 
-This is a code to compute Hawking evaporation from black holes and set constraints on the fraction of black holes. Although the code is designed for large extra dimension black holes, 4D black holes can also be studied with a proper setup. The code also improves over the previous code in various aspects. Please see [https://arxiv.org/pdf/2201.11761.pdf](https://arxiv.org/pdf/2201.11761.pdf) for details.
+This is a code to compute Hawking evaporation from black holes and set constraints on the fraction of black holes in dark matter. Although the code is designed for large extra dimension black holes, 4D black holes can also be studied with a proper setup. The code also improves over the previous code in various aspects. Please see [https://arxiv.org/pdf/2201.11761.pdf](https://arxiv.org/pdf/2201.11761.pdf) for details.
 
 ## Instructions for class_LED
 
